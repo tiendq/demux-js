@@ -12,4 +12,4 @@ examples/**/package-lock.json
 .idea/
 .vscode/
 
-dist/
+# dist/
