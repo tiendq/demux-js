@@ -33,7 +33,7 @@ class BaseActionWatcher {
      */
     replay() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.watch(true);
+            yield this.watch(true, undefined);
         });
     }
     /**
@@ -41,7 +41,7 @@ class BaseActionWatcher {
      *
      * @param isReplay  Set to true to disable Effects from running until caught up with head block.
      */
-    watch(isReplay = false) {
+    watch(isReplay = false, onError) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.shouldPause) {
                 this.running = false;
@@ -64,6 +64,9 @@ class BaseActionWatcher {
                 this.log.error(err);
                 this.error = err;
                 this.log.info('Indexing unexpectedly stopped due to an error.');
+                if (onError) {
+                    onError(err);
+                }
                 return;
             }
             const endTime = Date.now();
@@ -73,7 +76,7 @@ class BaseActionWatcher {
                 waitTime = 0;
             }
             this.log.debug(`Block check took ${duration}ms; waiting ${waitTime}ms before next check`);
-            setTimeout(() => __awaiter(this, void 0, void 0, function* () { return yield this.watch(false); }), waitTime);
+            setTimeout(() => __awaiter(this, void 0, void 0, function* () { return yield this.watch(false, onError); }), waitTime);
         });
     }
     /**
@@ -86,7 +89,7 @@ class BaseActionWatcher {
         }
         this.log.info('Starting indexing.');
         // tslint:disable-next-line:no-floating-promises
-        this.watch();
+        this.watch(false, undefined);
         return true;
     }
     /**

@@ -31,7 +31,7 @@ export declare class BaseActionWatcher {
      *
      * @param isReplay  Set to true to disable Effects from running until caught up with head block.
      */
-    watch(isReplay?: boolean): Promise<void>;
+    watch(isReplay: boolean, onError: any): Promise<void>;
     /**
      * Start or resume indexing.
      */

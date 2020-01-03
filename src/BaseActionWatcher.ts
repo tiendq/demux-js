@@ -42,7 +42,7 @@ export class BaseActionWatcher {
    * Starts a polling loop running in replay mode.
    */
   public async replay() {
-    await this.watch(true)
+    await this.watch(true, undefined)
   }
 
   /**
@@ -50,7 +50,7 @@ export class BaseActionWatcher {
    *
    * @param isReplay  Set to true to disable Effects from running until caught up with head block.
    */
-  public async watch(isReplay: boolean = false) {
+  public async watch(isReplay: boolean = false, onError: any) {
     if (this.shouldPause) {
       this.running = false
       this.shouldPause = false
@@ -72,6 +72,11 @@ export class BaseActionWatcher {
       this.log.error(err)
       this.error = err
       this.log.info('Indexing unexpectedly stopped due to an error.')
+
+      if (onError) {
+        onError(err)
+      }
+
       return
     }
 
@@ -82,7 +87,7 @@ export class BaseActionWatcher {
       waitTime = 0
     }
     this.log.debug(`Block check took ${duration}ms; waiting ${waitTime}ms before next check`)
-    setTimeout(async () => await this.watch(false), waitTime)
+    setTimeout(async () => await this.watch(false, onError), waitTime)
   }
 
   /**
@@ -96,7 +101,7 @@ export class BaseActionWatcher {
     this.log.info('Starting indexing.')
 
     // tslint:disable-next-line:no-floating-promises
-    this.watch()
+    this.watch(false, undefined)
     return true
   }
 
